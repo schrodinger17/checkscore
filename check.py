@@ -6,22 +6,24 @@ import xlwt as wt
 
 
 class Score(object):
-    def __init__(self, regular, experiment, final, total):
+    def __init__(self, regular, semi, experiment, final, total):
         self.regular = regular
+        self.semi = semi
         self.experiment = experiment
         self.final = final
         self.total = total
 
 
 class Course(object):
-    def __init__(self, name, semester, credit, score):
+    def __init__(self, id, name, semester, credit, score):
+        self.id = id
         self.name = name
         self.semester = semester
         self.credit = credit
         self.score = score
 
 
-payload = {'username': '******', 'password': '******'}
+payload = {'username': '**********', 'password': '**********'}
 headers = {
     'User-Agent': 'Mozilla/5.0(Macintosh; Intel Mac OS X 10_11_4)\
         AppleWebKit/537.36(KHTML, like Gecko) Chrome/52 .0.2743. 116 Safari/537.36'
@@ -49,10 +51,10 @@ for tbody in soup.find_all(name='tbody'):
             li.append(td)
             # print(len(li))
             if len(li) == 13:
-                # print(li)
+                # print(li[4].string)
                 # print(li[3].a.string)
-                course = Course(li[3].a.string, li[0].string, li[5].string,
-                                Score(li[6].string, li[7].string, li[8].string, li[10].string))
+                course = Course(li[4].string, li[3].a.string, li[0].string, li[5].string,
+                                Score(li[6].string, li[7].string, li[8].string, li[9].string, li[10].string))
                 courses.append(course)
                 li.clear()
     else:
@@ -87,9 +89,10 @@ for i in range(len(courses)):
         sheet.write(0, 0, '科目', style)
         sheet.write(0, 1, '学分', style)
         sheet.write(0, 2, '平时成绩', style)
-        sheet.write(0, 3, '实验成绩', style)
-        sheet.write(0, 4, '期末成绩', style)
-        sheet.write(0, 5, '总评成绩', style)
+        sheet.write(0, 3, '期中成绩', style)
+        sheet.write(0, 4, '实验成绩', style)
+        sheet.write(0, 5, '期末成绩', style)
+        sheet.write(0, 6, '总评成绩', style)
         sheet_names.append(courses[i].semester)
         sheets.append(sheet)
         lines.append(1)
@@ -111,10 +114,11 @@ for i in range(len(courses)):
     sheet.write(line, 0, courses[i].name, style)
     sheet.write(line, 1, courses[i].credit, style)
     sheet.write(line, 2, courses[i].score.regular, style)
-    sheet.write(line, 3, courses[i].score.experiment, style)
-    sheet.write(line, 4, courses[i].score.final, style)
-    sheet.write(line, 5, courses[i].score.total, style)
-    if 'P' not in courses[i].score.total:
+    sheet.write(line, 3, courses[i].score.semi, style)
+    sheet.write(line, 4, courses[i].score.experiment, style)
+    sheet.write(line, 5, courses[i].score.final, style)
+    sheet.write(line, 6, courses[i].score.total, style)
+    if 'P' not in courses[i].score.total and courses[i].id != '综合素养':
         score_sum += float(courses[i].score.total) * float(courses[i].credit)
         credit_sum += float(courses[i].credit)
     line += 1
